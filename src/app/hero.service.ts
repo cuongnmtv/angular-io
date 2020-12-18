@@ -11,7 +11,7 @@ import { MessageService } from './message.service';
 @Injectable({ providedIn: 'root' })
 export class HeroService {
 
-  private heroesUrl = 'api/heroes';  // URL to web api
+  private heroesUrl = "http://localhost:8080/api/heroes";
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -22,11 +22,11 @@ export class HeroService {
     private messageService: MessageService) { }
 
   /** GET heroes from the server */
-  getHeroes(): Observable<Hero[]> {
-    return this.http.get<Hero[]>(this.heroesUrl)
+  getHeroes(): Observable<ReponseHeroes> {
+    return this.http.get<ReponseHeroes>(this.heroesUrl)
       .pipe(
         tap(_ => this.log('fetched heroes')),
-        catchError(this.handleError<Hero[]>('getHeroes', []))
+        //catchError(this.handleError<ReponseHeroes>('getHeroes', []))
       );
   }
 
@@ -45,11 +45,11 @@ export class HeroService {
   }
 
   /** GET hero by id. Will 404 if id not found */
-  getHero(id: number): Observable<Hero> {
+  getHero(id: number): Observable<ReponseHero> {
     const url = `${this.heroesUrl}/${id}`;
-    return this.http.get<Hero>(url).pipe(
+    return this.http.get<ReponseHero>(url).pipe(
       tap(_ => this.log(`fetched hero id=${id}`)),
-      catchError(this.handleError<Hero>(`getHero id=${id}`))
+      //catchError(this.handleError<Hero>(`getHero id=${id}`))
     );
   }
 
@@ -70,10 +70,10 @@ export class HeroService {
   //////// Save methods //////////
 
   /** POST: add a new hero to the server */
-  addHero(hero: Hero): Observable<Hero> {
-    return this.http.post<Hero>(this.heroesUrl, hero, this.httpOptions).pipe(
-      tap((newHero: Hero) => this.log(`added hero w/ id=${newHero.id}`)),
-      catchError(this.handleError<Hero>('addHero'))
+  addHero(hero: Hero): Observable<ReponseHero> {
+    return this.http.post<ReponseHero>(this.heroesUrl, hero, this.httpOptions).pipe(
+      //tap((newHero: Hero) => this.log(`added hero w/ id=${newHero.id}`)),
+      //catchError(this.handleError<Hero>('addHero'))
     );
   }
 
@@ -120,4 +120,19 @@ export class HeroService {
   private log(message: string) {
     this.messageService.add(`HeroService: ${message}`);
   }
+
+}
+
+interface ReponseHeroes {
+  success: boolean;
+  errorCode: number;
+  message: string;
+  data: Hero[];
+}
+
+interface ReponseHero {
+  success: boolean;
+  errorCode: number;
+  message: string;
+  data: Hero;
 }
